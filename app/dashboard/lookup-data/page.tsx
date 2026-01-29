@@ -1,3 +1,4 @@
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import LookupDataClient from "@/components/admin/lookup-data-client"
@@ -33,9 +34,17 @@ export default async function LookupDataPage() {
   ])
 
   return (
-    <LookupDataClient
-      initialDepartments={departmentsRes.data || []}
-      initialLocations={locationsRes.data || []}
-    />
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">Lookup Data Management</h1>
+          <p className="text-muted-foreground">Manage departments, locations, positions, and roles</p>
+        </div>
+        <LookupDataClient
+          initialDepartments={departmentsRes.data || []}
+          initialLocations={locationsRes.data || []}
+        />
+      </div>
+    </DashboardLayout>
   )
 }

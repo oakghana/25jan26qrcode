@@ -56,6 +56,7 @@ interface UserProfile {
   last_name: string
   employee_id: string
   position: string
+  role?: string
   assigned_location_id?: string
   departments?: {
     name: string
@@ -669,6 +670,7 @@ export function AttendanceRecorder({
             last_name,
             employee_id,
             position,
+            role,
             assigned_location_id,
             departments (
               name,
@@ -1786,7 +1788,9 @@ export function AttendanceRecorder({
             </p>
           </CardContent>
         </Card>
-      )}
+      {/* Location Status - Admin Only */}
+      {userProfile?.role === "admin" && (
+      <Card>
 
       <Card>
         <CardHeader>
@@ -1896,6 +1900,7 @@ export function AttendanceRecorder({
           </div>
         </CardContent>
       </Card>
+      )}
 
       {showCodeEntry && (
         <LocationCodeDialog

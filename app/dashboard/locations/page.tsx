@@ -1,3 +1,4 @@
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { LocationManagement } from "@/components/admin/location-management"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
@@ -17,8 +18,14 @@ export default async function LocationsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <LocationManagement />
-    </div>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">Location Management</h1>
+          <p className="text-muted-foreground">Manage QCC office locations and geofence settings</p>
+        </div>
+        <LocationManagement />
+      </div>
+    </DashboardLayout>
   )
 }

@@ -4,7 +4,7 @@ import { QuickActions } from "@/components/dashboard/quick-actions"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Clock, Calendar, Users, TrendingUp, UserCheck, AlertCircle, Activity, Home } from "lucide-react"
+import { Clock, Calendar, Users, TrendingUp, UserCheck, AlertCircle, Activity, Home, LogIn, LogOut, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
@@ -58,6 +58,19 @@ export default async function DashboardPage() {
     pendingApprovals = count || 0
   }
 
+  // Determine check-in/check-out status
+  const isCheckedIn = todayAttendance?.check_in_time && !todayAttendance?.check_out_time
+  const isCheckedOut = todayAttendance?.check_out_time
+  const notCheckedIn = !todayAttendance?.check_in_time
+
+  // Calculate hours worked if checked out
+  let hoursWorked = 0
+  if (todayAttendance?.check_in_time && todayAttendance?.check_out_time) {
+    const checkIn = new Date(todayAttendance.check_in_time)
+    const checkOut = new Date(todayAttendance.check_out_time)
+    hoursWorked = (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60)
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -94,17 +107,104 @@ export default async function DashboardPage() {
           </Alert>
         )}
 
+        {/* Check-in/Check-out Warning Cards */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+          {/* Check-in Status Card */}
+          {notCheckedIn && (
+            <Card className="bg-amber-900 border-amber-700 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-800 rounded-xl">
+                    <LogIn className="h-6 w-6 text-amber-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white">Not Checked In</h3>
+                    <p className="text-amber-200 text-sm">You have not checked in today. Please check in to record your attendance.</p>
+                  </div>
+                </div>
+                <Button asChild className="w-full mt-4 bg-amber-700 hover:bg-amber-600 text-white">
+                  <Link href="/dashboard/attendance">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Check In Now
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {isCheckedIn && (
+            <Card className="bg-emerald-900 border-emerald-700 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-emerald-800 rounded-xl">
+                    <LogIn className="h-6 w-6 text-emerald-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white">Checked In ✓</h3>
+                    <p className="text-emerald-200 text-sm">
+                      Checked in at {new Date(todayAttendance.check_in_time).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Check-out Status Card */}
+          {isCheckedIn && (
+            <Card className="bg-orange-900 border-orange-700 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-orange-800 rounded-xl">
+                    <AlertTriangle className="h-6 w-6 text-orange-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white">Pending Check-out</h3>
+                    <p className="text-orange-200 text-sm">Remember to check out before leaving work today.</p>
+                  </div>
+                </div>
+                <Button asChild className="w-full mt-4 bg-orange-700 hover:bg-orange-600 text-white">
+                  <Link href="/dashboard/attendance">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Go to Attendance
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {isCheckedOut && (
+            <Card className="bg-emerald-900 border-emerald-700 shadow-lg sm:col-span-2">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-emerald-800 rounded-xl">
+                    <LogOut className="h-6 w-6 text-emerald-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white">Attendance Complete ✓</h3>
+                    <p className="text-emerald-200 text-sm">
+                      You worked {hoursWorked.toFixed(1)} hours today. Great job!
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
             title="Today's Status"
-            value={todayAttendance ? "Checked In" : "Not Checked In"}
+            value={isCheckedOut ? "Completed" : isCheckedIn ? "Checked In" : "Not Checked In"}
             description={
-              todayAttendance
-                ? `At ${new Date(todayAttendance.check_in_time).toLocaleTimeString()}`
-                : "Click to check in"
+              isCheckedOut
+                ? `Worked ${hoursWorked.toFixed(1)} hours`
+                : isCheckedIn
+                  ? `At ${new Date(todayAttendance.check_in_time).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`
+                  : "Click to check in"
             }
             icon={Clock}
-            variant={todayAttendance ? "success" : "default"}
+            variant={isCheckedOut ? "success" : isCheckedIn ? "warning" : "default"}
           />
 
           <StatsCard
@@ -177,25 +277,25 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
-              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl border border-primary/10">
-                <div className="text-2xl sm:text-3xl font-heading font-bold text-primary mb-2">{monthlyAttendance}</div>
-                <div className="text-sm font-medium text-muted-foreground">Days This Month</div>
+              <div className="text-center p-4 sm:p-6 bg-gray-900 rounded-xl border border-gray-700">
+                <div className="text-2xl sm:text-3xl font-heading font-bold text-white mb-2">{monthlyAttendance}</div>
+                <div className="text-sm font-medium text-gray-300">Days This Month</div>
               </div>
-              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-chart-2/5 to-chart-2/10 rounded-xl border border-chart-2/10">
-                <div className="text-2xl sm:text-3xl font-heading font-bold text-chart-2 mb-2">
+              <div className="text-center p-4 sm:p-6 bg-emerald-900 rounded-xl border border-emerald-700">
+                <div className="text-2xl sm:text-3xl font-heading font-bold text-white mb-2">
                   {monthlyAttendance ? Math.round((monthlyAttendance / new Date().getDate()) * 100) : 0}%
                 </div>
-                <div className="text-sm font-medium text-muted-foreground">Attendance Rate</div>
+                <div className="text-sm font-medium text-gray-300">Attendance Rate</div>
               </div>
-              <div className="text-center p-4 sm:p-6 bg-gradient-to-br from-chart-3/5 to-chart-3/10 rounded-xl border border-chart-3/10">
-                <div className="text-base sm:text-lg font-heading font-bold text-chart-3 mb-2">
+              <div className="text-center p-4 sm:p-6 bg-blue-900 rounded-xl border border-blue-700">
+                <div className="text-base sm:text-lg font-heading font-bold text-white mb-2">
                   {profile?.role === "admin"
                     ? "Administrator"
                     : profile?.role === "department_head"
                       ? "Department Head"
                       : "Staff"}
                 </div>
-                <div className="text-sm font-medium text-muted-foreground">Role</div>
+                <div className="text-sm font-medium text-gray-300">Role</div>
               </div>
             </div>
           </CardContent>

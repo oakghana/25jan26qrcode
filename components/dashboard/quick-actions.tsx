@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, QrCode, Calendar, Zap, ArrowRight } from "lucide-react"
+import { Clock, Calendar, Zap, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 export function QuickActions() {
@@ -17,17 +17,6 @@ export function QuickActions() {
       border: "border-green-200 hover:border-green-300",
       iconBg: "bg-gradient-to-br from-green-100 to-green-200",
       iconColor: "text-green-600",
-    },
-    {
-      title: "Scan QR Code",
-      description: "Quick attendance for events and special activities",
-      href: "/scan",
-      icon: QrCode,
-      gradient: "from-orange-50 via-orange-100 to-orange-150",
-      hoverGradient: "hover:from-orange-100 hover:via-orange-150 hover:to-orange-200",
-      border: "border-orange-200 hover:border-orange-300",
-      iconBg: "bg-gradient-to-br from-orange-100 to-orange-200",
-      iconColor: "text-orange-600",
     },
     {
       title: "View Schedule",
