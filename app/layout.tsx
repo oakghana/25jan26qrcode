@@ -1,4 +1,5 @@
 import type React from "react"
+import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { NotificationProvider } from "@/components/ui/notification-system"
@@ -9,7 +10,7 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700"], // Only load needed weights
+  weight: ["400", "500", "600", "700"],
   preload: true,
 })
 
@@ -17,15 +18,23 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-jetbrains-mono",
-  weight: ["400", "600"], // Only load needed weights
+  weight: ["400", "600"],
   preload: true,
 })
 
-export const metadata = {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#ea580c",
+}
+
+export const metadata: Metadata = {
   title: "QCC Electronic Attendance | Quality Control Company Limited",
   description: "Quality Control Company Limited Electronic Attendance System - Intranet Portal",
   manifest: "/manifest.json",
-  themeColor: "#ea580c",
   applicationName: "QCC Attendance",
   appleWebApp: {
     capable: true,
@@ -44,20 +53,13 @@ export const metadata = {
     apple: "/images/qcc-logo.png",
     shortcut: "/favicon.ico",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
-  },
   other: {
     "mobile-web-app-capable": "yes",
     "msapplication-config": "/browserconfig.xml",
     "msapplication-TileColor": "#ea580c",
     "msapplication-tap-highlight": "no",
   },
-    generator: 'v0.app'
+  generator: "v0.app",
 }
 
 export default function RootLayout({
@@ -66,8 +68,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-      <body className="font-sans">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <TimeBasedThemeProvider>
           <NotificationProvider>{children}</NotificationProvider>
           <PWAComponents />

@@ -182,10 +182,10 @@ export async function GET(request: NextRequest) {
         console.error("[v0] Roles fetch error:", rolesError)
         // Return default roles if table doesn't exist
         const defaultRoles = Object.keys(DEFAULT_ROLE_PERMISSIONS).map((role, index) => ({
-          id: \default-\\,
+          id: `default-${index}`,
           name: role,
           display_name: role.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-          description: \Default \ role\,
+          description: `Default ${role} role`,
           permissions: DEFAULT_ROLE_PERMISSIONS[role],
           is_system: true,
           is_active: true,

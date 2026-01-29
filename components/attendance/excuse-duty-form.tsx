@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -25,10 +25,14 @@ export function ExcuseDutyForm({ onSuccess, onSubmitSuccess }: ExcuseDutyFormPro
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const [formData, setFormData] = useState({
-    excuseDate: new Date().toISOString().split("T")[0],
+    excuseDate: "",
     documentType: "",
     excuseReason: "",
   })
+
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, excuseDate: new Date().toISOString().split("T")[0] }))
+  }, [])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -251,3 +255,6 @@ export function ExcuseDutyForm({ onSuccess, onSubmitSuccess }: ExcuseDutyFormPro
     </Card>
   )
 }
+
+
+

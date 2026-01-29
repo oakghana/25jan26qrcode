@@ -55,7 +55,7 @@ export function LocationManagement() {
   const [editingLocation, setEditingLocation] = useState<GeofenceLocation | null>(null)
   const [selectedLocation, setSelectedLocation] = useState<GeofenceLocation | null>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [isOnline, setIsOnline] = useState(true)
   const [locationPermission, setLocationPermission] = useState<"granted" | "denied" | "prompt" | null>(null)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const [retryCount, setRetryCount] = useState(0)
@@ -69,6 +69,7 @@ export function LocationManagement() {
   })
 
   useEffect(() => {
+    setIsOnline(navigator.onLine)
     fetchLocations()
     checkLocationPermission()
 
@@ -1028,3 +1029,5 @@ export function LocationManagement() {
     </div>
   )
 }
+
+

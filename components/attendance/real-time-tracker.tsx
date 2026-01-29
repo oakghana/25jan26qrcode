@@ -33,20 +33,26 @@ interface RealTimeData {
 }
 
 export function RealTimeTracker() {
+  const [mounted, setMounted] = useState(false)
   const [data, setData] = useState<RealTimeData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
+
+  useEffect(() => {
+    setMounted(true)
+    setCurrentTime(new Date())
+  }, [])
 
   useEffect(() => {
     fetchRealTimeData()
     const interval = setInterval(fetchRealTimeData, 30000) // Update every 30 seconds
     return () => clearInterval(interval)
   }, [])
-
   useEffect(() => {
+    if (!mounted) return
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [mounted])
 
   const fetchRealTimeData = async () => {
     try {
@@ -291,3 +297,5 @@ export function RealTimeTracker() {
     </div>
   )
 }
+
+

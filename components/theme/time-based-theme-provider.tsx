@@ -26,10 +26,14 @@ export function TimeBasedThemeProvider({
 }: {
   children: React.ReactNode
 }) {
+  // Start with undefined to avoid hydration mismatch, will be set on client
+  const [mounted, setMounted] = useState(false)
   const [theme, setTheme] = useState<"light" | "dark">("light")
   const [isAutoTheme, setIsAutoTheme] = useState(true)
 
+  // Only run on client after mount
   useEffect(() => {
+    setMounted(true)
     // Load saved preferences
     const savedAutoTheme = localStorage.getItem("qcc-auto-theme")
     const savedManualTheme = localStorage.getItem("qcc-manual-theme")
@@ -65,6 +69,7 @@ export function TimeBasedThemeProvider({
   }, [isAutoTheme])
 
   useEffect(() => {
+    if (!mounted) return
     // Apply theme to document
     const root = document.documentElement
     if (theme === "dark") {
@@ -72,7 +77,7 @@ export function TimeBasedThemeProvider({
     } else {
       root.classList.remove("dark")
     }
-  }, [theme])
+  }, [theme, mounted])
 
   const toggleAutoTheme = () => {
     const newAutoTheme = !isAutoTheme

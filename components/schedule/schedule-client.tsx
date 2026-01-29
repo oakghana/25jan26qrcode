@@ -35,7 +35,7 @@ const initialScheduleState = {
   description: "",
   start_time: "",
   end_time: "",
-  date: new Date().toISOString().split("T")[0],
+  date: "",
   type: "work" as const,
 }
 
@@ -45,7 +45,7 @@ export function ScheduleClient() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
+  const [selectedDate, setSelectedDate] = useState("")
   const [newSchedule, setNewSchedule] = useState(initialScheduleState)
 
   const typeColors = useMemo(
@@ -152,6 +152,12 @@ export function ScheduleClient() {
     (type: string) => typeColors[type as keyof typeof typeColors] || "bg-gray-500",
     [typeColors],
   )
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]
+    setSelectedDate(today)
+    setNewSchedule(prev => ({ ...prev, date: today }))
+  }, [])
 
   useEffect(() => {
     fetchSchedules()
@@ -363,3 +369,5 @@ export function ScheduleClient() {
     </div>
   )
 }
+
+

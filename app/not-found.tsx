@@ -1,10 +1,15 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Home, ArrowLeft } from "lucide-react"
 import Image from "next/image"
 
 export default function NotFound() {
+  const router = useRouter()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-md text-center">
@@ -14,7 +19,7 @@ export default function NotFound() {
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Page Not Found</CardTitle>
           <CardDescription className="text-base">
-            The page you're looking for doesn't exist or has been moved.
+            The page you are looking for does not exist or has been moved.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -26,11 +31,9 @@ export default function NotFound() {
                 Go to Dashboard
               </Link>
             </Button>
-            <Button variant="outline" asChild className="w-full bg-transparent">
-              <Link href="javascript:history.back()">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Go Back
-              </Link>
+            <Button variant="outline" className="w-full bg-transparent" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Go Back
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-6">QCC Electronic Attendance App</p>

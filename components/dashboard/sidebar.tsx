@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
 import { clearAppCache } from "@/lib/cache-manager"
 import {
   Home,

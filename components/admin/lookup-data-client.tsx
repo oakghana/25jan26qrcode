@@ -361,19 +361,19 @@ export default function LookupDataClient({
 
   // Handle delete
   const handleDelete = async (type: string, id: string, name: string) => {
-    if (!confirm(\Are you sure you want to delete "\"? This action cannot be undone.\)) {
+    if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
       return
     }
     
     try {
-      const response = await fetch(\/api/admin/lookup-data?type=\&id=\\, {
+      const response = await fetch(`/api/admin/lookup-data?type=${type}&id=${id}`, {
         method: "DELETE",
       })
       
       const data = await response.json()
       
       if (data.success) {
-        toast.success(\\ deleted successfully\)
+        toast.success(`${name} deleted successfully`)
         fetchLookupData()
       } else {
         toast.error(data.error || "Failed to delete")
@@ -508,7 +508,7 @@ export default function LookupDataClient({
       ...prev,
       permissions: defaults
     }))
-    toast.success(\Applied default permissions for \\)
+    toast.success(`Applied default permissions for ${roleForm.name}`)
   }
 
   if (!user || !profile) {
@@ -757,7 +757,7 @@ export default function LookupDataClient({
                             <div className="flex items-center justify-between">
                               <Label className="text-lg font-semibold">Location Access</Label>
                               <Badge variant="secondary">
-                                {roleForm.location_access.length === 0 ? "All Locations" : \\ selected\}
+                                {roleForm.location_access.length === 0 ? "All Locations" : `${roleForm.location_access.length} selected`}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">
@@ -770,12 +770,12 @@ export default function LookupDataClient({
                                   className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                                 >
                                   <Checkbox
-                                    id={\loc-\\}
+                                    id={`loc-${loc.id}`}
                                     checked={roleForm.location_access.includes(loc.id)}
                                     onCheckedChange={() => toggleLocationAccess(loc.id)}
                                   />
                                   <label
-                                    htmlFor={\loc-\\}
+                                    htmlFor={`loc-${loc.id}`}
                                     className="text-sm cursor-pointer flex items-center gap-2"
                                   >
                                     <MapPin className="h-3 w-3 text-muted-foreground" />
@@ -793,7 +793,7 @@ export default function LookupDataClient({
                             <div className="flex items-center justify-between">
                               <Label className="text-lg font-semibold">Department Access</Label>
                               <Badge variant="secondary">
-                                {roleForm.department_access.length === 0 ? "All Departments" : \\ selected\}
+                                {roleForm.department_access.length === 0 ? "All Departments" : `${roleForm.location_access.length} selected`}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">
@@ -806,12 +806,12 @@ export default function LookupDataClient({
                                   className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                                 >
                                   <Checkbox
-                                    id={\dept-\\}
+                                    id={`dept-${dept.id}`}
                                     checked={roleForm.department_access.includes(dept.id)}
                                     onCheckedChange={() => toggleDepartmentAccess(dept.id)}
                                   />
                                   <label
-                                    htmlFor={\dept-\\}
+                                    htmlFor={`dept-${dept.id}`}
                                     className="text-sm cursor-pointer flex items-center gap-2"
                                   >
                                     <Building className="h-3 w-3 text-muted-foreground" />
@@ -1429,3 +1429,4 @@ export default function LookupDataClient({
     </div>
   )
 }
+

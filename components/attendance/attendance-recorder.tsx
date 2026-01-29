@@ -145,7 +145,7 @@ export function AttendanceRecorder({
   const [windowsCapabilities, setWindowsCapabilities] = useState<ReturnType<
     typeof detectWindowsLocationCapabilities
   > | null>(null)
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split("T")[0])
+  const [currentDate, setCurrentDate] = useState("")
   const [showEarlyCheckoutDialog, setShowEarlyCheckoutDialog] = useState(false)
   const [earlyCheckoutReason, setEarlyCheckoutReason] = useState("")
   const [pendingCheckoutData, setPendingCheckoutData] = useState<{
@@ -178,6 +178,11 @@ export function AttendanceRecorder({
 
   const [isCheckInProcessing, setIsCheckInProcessing] = useState(false)
   const [lastCheckInAttempt, setLastCheckInAttempt] = useState<number>(0)
+
+  // Initialize currentDate on client side
+  useEffect(() => {
+    setCurrentDate(new Date().toISOString().split("T")[0])
+  }, [])
 
   // Check if cache should be cleared (new day)
   useEffect(() => {
@@ -1996,3 +2001,5 @@ export function AttendanceRecorder({
     </div>
   )
 }
+
+

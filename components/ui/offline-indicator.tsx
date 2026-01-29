@@ -5,13 +5,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { WifiOff, Wifi, Download } from "lucide-react"
 
 export function OfflineIndicator() {
+  const [mounted, setMounted] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [showOfflineAlert, setShowOfflineAlert] = useState(false)
   const [hasPendingData, setHasPendingData] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
     const updateOnlineStatus = () => {
-      const online = navigator.onLine
+      const online = typeof navigator !== 'undefined' ? navigator.onLine : true
       setIsOnline(online)
 
       if (!online) {
@@ -68,9 +75,9 @@ export function OfflineIndicator() {
       window.removeEventListener("online", updateOnlineStatus)
       window.removeEventListener("offline", updateOnlineStatus)
     }
-  }, [showOfflineAlert])
+  }, [showOfflineAlert, mounted])
 
-  if (!showOfflineAlert) return null
+  if (!mounted || !showOfflineAlert) return null
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
