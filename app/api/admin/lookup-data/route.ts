@@ -312,24 +312,41 @@ export async function POST(request: NextRequest) {
 
     // Create/Update Role
     if (type === "role") {
-      const { data: role, error } = await supabase
-        .from("roles")
-        .upsert({
-          id: data.id,
-          name: data.name,
-          display_name: data.display_name,
-          description: data.description,
-          permissions: data.permissions,
-          is_system: data.is_system || false,
-          is_active: data.is_active ?? true,
-          location_access: data.location_access || [],
-          department_access: data.department_access || [],
-        })
-        .select()
-        .single()
+      const roleData = {
+        name: data.name,
+        display_name: data.display_name,
+        description: data.description,
+        permissions: data.permissions || [],
+        is_system: data.is_system || false,
+        is_active: data.is_active ?? true,
+        location_access: data.location_access || [],
+        department_access: data.department_access || [],
+      }
+
+      let role, error
+      if (data.id) {
+        // Update existing role
+        const result = await supabase
+          .from("roles")
+          .update(roleData)
+          .eq("id", data.id)
+          .select()
+          .single()
+        role = result.data
+        error = result.error
+      } else {
+        // Insert new role
+        const result = await supabase
+          .from("roles")
+          .insert(roleData)
+          .select()
+          .single()
+        role = result.data
+        error = result.error
+      }
 
       if (error) {
-        console.error("[v0] Role create error:", error)
+        console.error("[v0] Role create/update error:", error)
         return NextResponse.json({ success: false, error: error.message }, { status: 500 })
       }
 

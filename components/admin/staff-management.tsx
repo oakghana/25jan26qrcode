@@ -59,10 +59,20 @@ interface Location {
   longitude: number
 }
 
+interface Role {
+  id: string
+  name: string
+  display_name: string
+  description?: string
+  is_system?: boolean
+  is_active?: boolean
+}
+
 export function StaffManagement() {
   const [staff, setStaff] = useState<StaffMember[]>([])
   const [departments, setDepartments] = useState<Department[]>([])
   const [locations, setLocations] = useState<Location[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDepartment, setSelectedDepartment] = useState("all")
@@ -119,6 +129,7 @@ export function StaffManagement() {
     fetchStaff()
     fetchDepartments()
     fetchLocations()
+    fetchRoles()
     fetchCurrentUserRole()
   }, [fetchStaff])
 
@@ -170,6 +181,41 @@ export function StaffManagement() {
     }
   }
 
+
+  const fetchRoles = async () => {
+    try {
+      console.log("[v0] Fetching roles...")
+      const response = await fetch("/api/admin/lookup-data?type=roles")
+      const result = await response.json()
+      console.log("[v0] Roles fetch result:", result)
+
+      if (result.success && result.roles) {
+        setRoles(result.roles)
+      } else {
+        // Fallback to default roles if fetch fails
+        setRoles([
+          { id: "1", name: "staff", display_name: "Staff" },
+          { id: "2", name: "department_head", display_name: "Department Head" },
+          { id: "3", name: "it-admin", display_name: "IT Admin" },
+          { id: "4", name: "admin", display_name: "Admin" },
+          { id: "5", name: "nsp", display_name: "NSP" },
+          { id: "6", name: "intern", display_name: "Intern" },
+          { id: "7", name: "contract", display_name: "Contract" },
+        ])
+      }
+    } catch (error) {
+      console.error("[v0] Roles fetch exception:", error)
+      setRoles([
+        { id: "1", name: "staff", display_name: "Staff" },
+        { id: "2", name: "department_head", display_name: "Department Head" },
+        { id: "3", name: "it-admin", display_name: "IT Admin" },
+        { id: "4", name: "admin", display_name: "Admin" },
+        { id: "5", name: "nsp", display_name: "NSP" },
+        { id: "6", name: "intern", display_name: "Intern" },
+        { id: "7", name: "contract", display_name: "Contract" },
+      ])
+    }
+  }
   const fetchCurrentUserRole = async () => {
     try {
       console.log("[v0] Fetching current user role...")
@@ -417,13 +463,11 @@ export function StaffManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Roles</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="it-admin">IT-Admin</SelectItem>
-                  <SelectItem value="department_head">Department Head</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
-                  <SelectItem value="nsp">NSP</SelectItem>
-                  <SelectItem value="intern">Intern</SelectItem>
-                  <SelectItem value="contract">Contract</SelectItem>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.name}>
+                      {role.display_name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -561,15 +605,15 @@ export function StaffManagement() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="staff">Staff</SelectItem>
-                          <SelectItem value="department_head">Department Head</SelectItem>
-                          {(currentUserRole === "admin" || currentUserRole === "it-admin") && (
-                            <SelectItem value="it-admin">IT Admin</SelectItem>
-                          )}
-                          {currentUserRole === "admin" && <SelectItem value="admin">Admin</SelectItem>}
-                          <SelectItem value="nsp">NSP</SelectItem>
-                          <SelectItem value="intern">Intern</SelectItem>
-                          <SelectItem value="contract">Contract</SelectItem>
+                          {roles.map((role) => {
+                            if (role.name === "admin" && currentUserRole !== "admin") return null
+                            if (role.name === "it-admin" && currentUserRole !== "admin" && currentUserRole !== "it-admin") return null
+                            return (
+                              <SelectItem key={role.id} value={role.name}>
+                                {role.display_name}
+                              </SelectItem>
+                            )
+                          })}
                         </SelectContent>
                       </Select>
                     </div>
@@ -720,16 +764,16 @@ export function StaffManagement() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="staff">Staff</SelectItem>
-                        <SelectItem value="department_head">Department Head</SelectItem>
-                        {(currentUserRole === "admin" || currentUserRole === "it-admin") && (
-                          <SelectItem value="it-admin">IT Admin</SelectItem>
-                        )}
-                        {currentUserRole === "admin" && <SelectItem value="admin">Admin</SelectItem>}
-                        <SelectItem value="nsp">NSP</SelectItem>
-                        <SelectItem value="intern">Intern</SelectItem>
-                        <SelectItem value="contract">Contract</SelectItem>
-                      </SelectContent>
+                          {roles.map((role) => {
+                            if (role.name === "admin" && currentUserRole !== "admin") return null
+                            if (role.name === "it-admin" && currentUserRole !== "admin" && currentUserRole !== "it-admin") return null
+                            return (
+                              <SelectItem key={role.id} value={role.name}>
+                                {role.display_name}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
                     </Select>
                   </div>
                   <div>
