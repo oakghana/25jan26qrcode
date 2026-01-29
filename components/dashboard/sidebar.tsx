@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, memo, useMemo } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -28,7 +28,6 @@ import {
   Users,
   UserCheck,
   Upload,
-  Database,
   Shield,
   Settings,
   X,
@@ -42,6 +41,8 @@ import {
   Archive,
   ShieldAlert,
   TrendingUp,
+  Calendar,
+  Database,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -65,7 +66,7 @@ interface SidebarProps {
 const navigationItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/dashboard/overview",
     icon: Home,
     roles: ["admin", "department_head", "staff"],
     category: "main",
@@ -83,6 +84,13 @@ const navigationItems = [
     icon: FileText,
     roles: ["admin", "it-admin", "department_head", "staff"],
     category: "main",
+  },
+  {
+    title: "Leave Management",
+    href: "/dashboard/leave-management",
+    icon: Calendar,
+    roles: ["admin", "department_head"],
+    category: "admin",
   },
   {
     title: "Excuse Duty Review",
@@ -240,6 +248,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
     try {
       const supabase = createClient()
 
+      // Log the action
       await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
@@ -247,11 +256,14 @@ export function Sidebar({ user, profile }: SidebarProps) {
         },
       }).catch(console.error)
 
+      // Sign out from Supabase
       await supabase.auth.signOut()
 
+      // Clear all data, cache, cookies, and storage
       const { clearAllDataAndLogout } = await import("@/lib/cache-manager")
       await clearAllDataAndLogout()
 
+      // Force redirect to login with a clean slate
       window.location.href = "/auth/login"
     } catch (error) {
       console.error("[v0] Failed to clear cache:", error)
@@ -286,7 +298,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
   const adminItems = filteredNavItems.filter((item) => item.category === "admin")
   const settingsItems = filteredNavItems.filter((item) => item.category === "settings")
 
-  const userInitials = profile ? \\\\ : "U"
+  const userInitials = profile ? `${profile.first_name[0]}${profile.last_name[0]}` : "U"
 
   return (
     <>
@@ -373,6 +385,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
                   const isActive = pathname === item.href || item.subItems?.some((subItem) => pathname === subItem.href)
 
                   if (item.subItems) {
+                    // Items with subItems use dropdown menu
                     return (
                       <DropdownMenu key={item.href}>
                         <DropdownMenuTrigger asChild>
@@ -407,6 +420,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
                     )
                   }
 
+                  // Regular items without subItems use Link
                   return (
                     <Link
                       key={item.href}
@@ -500,7 +514,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
                 >
                   <div className="relative">
                     <Avatar className="h-10 w-10 ring-2 ring-primary/20 transition-all duration-300 hover:ring-primary/40">
-                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarImage src={profile?.profile_image_url || "/placeholder.svg"} />
                       <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm font-bold">
                         {userInitials}
                       </AvatarFallback>
@@ -509,7 +523,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-sm font-semibold text-sidebar-foreground">
-                      {profile ? \\ \\ : "Loading..."}
+                      {profile ? `${profile.first_name} ${profile.last_name}` : "Loading..."}
                     </p>
                     <p className="text-xs text-muted-foreground font-medium">
                       {profile?.departments?.name || "No department"}
