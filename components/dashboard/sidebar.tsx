@@ -42,6 +42,7 @@ import {
   TrendingUp,
   Calendar,
   Database,
+  KeyRound,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -544,6 +545,15 @@ export function Sidebar({ user, profile }: SidebarProps) {
                   >
                     <User className="h-4 w-4" />
                     <span className="font-medium">Profile Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/dashboard/profile?tab=security"
+                    className="flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-all duration-200 touch-manipulation min-h-[44px]"
+                  >
+                    <KeyRound className="h-4 w-4 text-amber-500" />
+                    <span className="font-medium">Change Password</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

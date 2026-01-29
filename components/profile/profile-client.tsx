@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -69,6 +70,14 @@ export function ProfileClient() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const searchParams = useSearchParams()
+
+  // Check URL param to auto-open password change
+  useEffect(() => {
+    if (searchParams.get("tab") === "security") {
+      setShowPasswordChange(true)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetchProfile()
